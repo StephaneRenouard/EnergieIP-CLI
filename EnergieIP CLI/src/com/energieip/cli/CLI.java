@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Scanner;
 
 import com.energieip.mobus.objects.CommonLists;
+import com.energieip.mobus.objects.ID11;
 import com.energieip.mobus.objects.ID2;
 import com.energieip.modbus.tools.ModbusDataBuilder;
-import com.energieip.modbuscan.ModbusScan;
 
 import de.re.easymodbus.modbusclient.ModbusClient;
 import fr.handco.lib.time.Time;
@@ -24,19 +24,17 @@ public class CLI implements Runnable {
 	ModbusClient modbusClient;
 
 	Thread thread;
-	
+
 	private static boolean ListFlag = false;
-	
-	private static List<com.energieip.mobus.objects.ID2> driverList;
-	
+
+	// private static List<com.energieip.mobus.objects.ID2> driverList;
+
 	/**
 	 * Default param
 	 */
 	final String DEFAULT_FILE = "driverList.eip";
 	final String DEFAULT_IP = "192.168.0.118";
 	final int DEFAULT_PORT = 502;
-	
-	
 
 	/**
 	 * Main entry point
@@ -60,13 +58,10 @@ public class CLI implements Runnable {
 		 * 
 		 * ORDRE %1 %2 %3 %4 %5
 		 * 
-		 * show -> show commands help -> show scan IP:PORT  
-		 * scan (default 192.168.0.118:502) -> perform a modbus scan read FILE 
-		 * read (default=driverList.eip) 
-		 * list rack list -> return NO SCAN / FILE
-		 * error; other 
-		 * list drivers L25 (SA25, L), MC 
-		 * total light=SS
+		 * show -> show commands help -> show scan IP:PORT scan (default
+		 * 192.168.0.118:502) -> perform a modbus scan read FILE read
+		 * (default=driverList.eip) list rack list -> return NO SCAN / FILE
+		 * error; other list drivers L25 (SA25, L), MC total light=SS
 		 * 
 		 * Total driver=XX list L25 L25: show details
 		 * 
@@ -133,10 +128,10 @@ public class CLI implements Runnable {
 
 			switch (key) {
 			case "connect":
-				
+
 				String ip = DEFAULT_IP;
 				int port = DEFAULT_PORT;
-				
+
 				if (input.length > 1) {
 					ip = input[1];
 				}
@@ -155,15 +150,14 @@ public class CLI implements Runnable {
 					e.printStackTrace();
 				}
 				System.out.println(Time.timeStamp("modbus connected"));
-				
+
 				break;
 			case "disconnect":
 				try {
 					modbusClient.Disconnect();
 				} catch (IOException e) {
 					System.out.println(Time.timeStamp("modbus disconnected"));
-				}
-				catch(Exception ee){
+				} catch (Exception ee) {
 					System.out.println(Time.timeStamp("modbus disconnected"));
 				}
 				break;
@@ -192,14 +186,14 @@ public class CLI implements Runnable {
 				}
 				System.out.println(Time.timeStamp("Scanning " + _ip + ":" + _port));
 				ModbusScan.Scan(_ip, _port, output_file);
-				//System.out.println("writing file " + output_file);
+				// System.out.println("writing file " + output_file);
 				break;
-				
+
 			case "read":
-				
-				String file=DEFAULT_FILE;
-				
-				if(input.length>1){
+
+				String file = DEFAULT_FILE;
+
+				if (input.length > 1) {
 					file = input[1];
 				}
 
@@ -217,55 +211,63 @@ public class CLI implements Runnable {
 				} catch (ClassNotFoundException e) {
 					System.err.println(Time.timeStamp("ERROR: Internal Error (ClassNotFoundException)"));
 				}
-				
+
 				System.out.println(Time.timeStamp("Building objects"));
-				
-				
+
 				// ID3 is a standalone register
 				CommonLists.iD3 = new com.energieip.mobus.objects.ID3();
-				
-				// make ID11 (light) list 
+
+				// make ID11 (light) list
 				ModbusDataBuilder.makeID11List();
-				
+
 				// make ID12 (HVAC) list
 				ModbusDataBuilder.makeID12List();
-				
+
 				// make ID13 (shutter) list
 				ModbusDataBuilder.makeID13List();
 
-				
 				// make group list
 				ModbusDataBuilder.makeGroupList();
-				
+
 				// make ID100 (group param) list
 				ModbusDataBuilder.makeID100List();
-					
-					// file found and data acquired
-					System.out.println(Time.timeStamp("Data acquired"));
-					ListFlag = true;
-					break;
-					
+
+				// file found and data acquired
+				System.out.println(Time.timeStamp("Data acquired"));
+				ListFlag = true;
+				break;
+
 			case "list":
-				
-				if(ListFlag){
-					
+
+				if (ListFlag) {
+
 					String fileName = DEFAULT_FILE;
-					
-				if (input.length > 1) {
-					fileName = input[1];
-				}
-				
-				System.out.println(Time.timeStamp("LIGHT drivers:"));
-				
-				
-				
-				// default case
+
+					if (input.length > 1) {
+						fileName = input[1];
+					}
+
+					System.out.println(Time.timeStamp("LIGHT drivers:"));
+
+					int count = 0;
+
+					for (Iterator<ID11> iterator = CommonLists.ID11List.iterator(); iterator.hasNext();) {
+
+						ID11 id11 = (ID11) iterator.next();
+						System.out.println("L" + id11.shortAddress + "(group " + id11.group + ")");
+
+						count++;
+
+					}
+					System.out.println("Number of ligth drivers=" + CommonLists.ID11List.size());
+
+					// default case
 				} // end if listFlag
-				else{
+				else {
 					// no list in memory
 					System.err.println(Time.timeStamp("ERROR: no data in memory, perform a scan first"));
 				}
-				
+
 				break;
 
 			case "":
@@ -281,6 +283,5 @@ public class CLI implements Runnable {
 		}
 
 	}// end of InputAnalyse()
-	
 
 }// end of class
