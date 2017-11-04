@@ -6,5 +6,6 @@
 	<classpathentry kind="lib" path="C:/Users/stephane/Documents/GitHub/EnergieIP-modbus-objects/EnergieIP modbus objects/jar/com.energieip.modbus.objects-1.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/stephane/Documents/GitHub/EnergieIP-modbus-scanner/EnergieIP modbus scanner/lib/com.energieip.easymodbus-1.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/stephane/Documents/GitHub/LibHandco/LibHandco/jar/LibHandco-1.0.jar"/>
+	<classpathentry kind="src" path="/EnergieIP modbus scanner"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

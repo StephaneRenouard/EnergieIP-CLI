@@ -14,6 +14,8 @@ import com.energieip.mobus.objects.ID11;
 import com.energieip.mobus.objects.ID2;
 import com.energieip.modbus.tools.ModbusDataBuilder;
 
+import com.energieip.modbuscan.ModbusScan;
+
 import de.re.easymodbus.modbusclient.ModbusClient;
 import fr.handco.lib.time.Time;
 
@@ -25,7 +27,8 @@ public class CLI implements Runnable {
 
 	Thread thread;
 
-	private static boolean ListFlag = false;
+	private boolean ListFlag = false; // indicate that we have a file in memory
+	private boolean ConnectionFlag = false; // indicate connection state
 
 	// private static List<com.energieip.mobus.objects.ID2> driverList;
 
@@ -142,6 +145,7 @@ public class CLI implements Runnable {
 				try {
 					ModbusClient modbusClient = new ModbusClient(ip, port);
 					modbusClient.Connect();
+					ConnectionFlag=true;
 				} catch (UnknownHostException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -155,6 +159,7 @@ public class CLI implements Runnable {
 			case "disconnect":
 				try {
 					modbusClient.Disconnect();
+					ConnectionFlag = false;
 				} catch (IOException e) {
 					System.out.println(Time.timeStamp("modbus disconnected"));
 				} catch (Exception ee) {
@@ -185,6 +190,7 @@ public class CLI implements Runnable {
 					output_file = input[3];
 				}
 				System.out.println(Time.timeStamp("Scanning " + _ip + ":" + _port));
+				
 				ModbusScan.Scan(_ip, _port, output_file);
 				// System.out.println("writing file " + output_file);
 				break;
@@ -254,7 +260,7 @@ public class CLI implements Runnable {
 					for (Iterator<ID11> iterator = CommonLists.ID11List.iterator(); iterator.hasNext();) {
 
 						ID11 id11 = (ID11) iterator.next();
-						System.out.println("L" + id11.shortAddress + "(group " + id11.group + ")");
+						System.out.println("L" + id11.shortAddress + " (group " + id11.group + ")");
 
 						count++;
 
@@ -269,6 +275,47 @@ public class CLI implements Runnable {
 				}
 
 				break;
+				/*
+				 * SET
+				 */
+			case "set":
+				
+				if (ListFlag && ConnectionFlag && input.length>1) {
+					
+					switch (input[1]) {
+					case "watchdog":
+						if (input.length > 2) {
+							Tools.setWatchdog(Integer.getInteger(input[2]));
+						}
+						
+						break;
+					case "group": // set group L21 2
+						break;
+					case "":
+						System.err.println(Time.timeStamp("Error: bad syntax"));
+						break;
+					default:
+						//System.err.println(Time.timeStamp("Error: bad syntax"));
+						
+						break;
+					}
+					
+				}
+				else {
+					if(ListFlag==false){
+						System.err.println(Time.timeStamp("Error: you first need to load a description file in memory"));
+					}
+					if(ConnectionFlag==false){
+						System.err.println(Time.timeStamp("Error: you need to connect to modbus"));
+							
+					}
+					else{
+						System.err.println(Time.timeStamp("Error: bad syntax"));
+						
+					}
+				}
+				
+					break;
 
 			case "":
 				break;
