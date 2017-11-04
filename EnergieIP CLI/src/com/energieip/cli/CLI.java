@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +17,7 @@ import com.energieip.modbus.tools.ModbusDataBuilder;
 
 import com.energieip.modbuscan.ModbusScan;
 
+import de.re.easymodbus.exceptions.ModbusException;
 import de.re.easymodbus.modbusclient.ModbusClient;
 import fr.handco.lib.time.Time;
 
@@ -36,9 +38,12 @@ public class CLI implements Runnable {
 	 * Default param
 	 */
 	final String DEFAULT_FILE = "driverList.eip";
-	final String DEFAULT_IP = "192.168.0.118";
-	final int DEFAULT_PORT = 502;
-
+	//final String DEFAULT_IP = "192.168.0.118";
+	//final int DEFAULT_PORT = 502;
+	final String DEFAULT_IP = "91.160.78.238";
+	final int DEFAULT_PORT = 41115;
+	
+	
 	/**
 	 * Main entry point
 	 * 
@@ -134,18 +139,22 @@ public class CLI implements Runnable {
 
 				String ip = DEFAULT_IP;
 				int port = DEFAULT_PORT;
-
+				
 				if (input.length > 1) {
 					ip = input[1];
 				}
 				if (input.length > 2) {
 					port = Integer.parseInt(input[2]);
 				}
-
+				
+				modbusClient = new ModbusClient(ip, port);
+				
 				try {
-					ModbusClient modbusClient = new ModbusClient(ip, port);
+					
 					modbusClient.Connect();
+					
 					ConnectionFlag=true;
+					
 				} catch (UnknownHostException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -153,7 +162,7 @@ public class CLI implements Runnable {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				System.out.println(Time.timeStamp("modbus connected"));
+				System.out.println(Time.timeStamp("modbus connected with timeout="+ modbusClient.getConnectionTimeout()));
 
 				break;
 			case "disconnect":
@@ -284,8 +293,13 @@ public class CLI implements Runnable {
 					
 					switch (input[1]) {
 					case "watchdog":
-						if (input.length > 2) {
-							Tools.setWatchdog(Integer.getInteger(input[2]));
+						
+						if (input.length < 4) { // to get the #3 parameter
+							
+							setWatchdog(Integer.parseInt(input[2]));
+							
+						}else{
+							System.err.println(Time.timeStamp("ERROR: bad syntax"));
 						}
 						
 						break;
@@ -295,7 +309,7 @@ public class CLI implements Runnable {
 						System.err.println(Time.timeStamp("Error: bad syntax"));
 						break;
 					default:
-						//System.err.println(Time.timeStamp("Error: bad syntax"));
+						System.err.println(Time.timeStamp("Error: bad syntax"));
 						
 						break;
 					}
@@ -330,5 +344,52 @@ public class CLI implements Runnable {
 		}
 
 	}// end of InputAnalyse()
+	
+	/**
+	 * setWatchdog
+	 * @param value
+	 */
+public boolean setWatchdog(int value) {
+			
+		try {
+			
+			modbusClient.Disconnect();
+			modbusClient.Connect();
+			
+			modbusClient.setUnitIdentifier((byte) 3); // ID 3 (watchdog)
+			int[] Result  = modbusClient.ReadHoldingRegisters(0, 1);
+			
+			// keep previous value for comparaison
+			int previous_value = Result[0];
+			
+			modbusClient.WriteSingleRegister(0, value);
+			
+			// check result
+			Result  = modbusClient.ReadHoldingRegisters(0, 5);
+			
+			int actual_value = Result[0];
+			
+			System.out.println(Time.timeStamp("[OK] Watchdog value from " + previous_value + " to " + actual_value ));
+			
+			
+
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ModbusException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} // first register in ID2
+		
+		
+		return true;
+	}
+
 
 }// end of class
