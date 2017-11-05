@@ -2,10 +2,10 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="lib" path="C:/Users/stephane/Documents/GitHub/EnergieIP-modbus-scanner/EnergieIP modbus scanner/jar/LIBcom.energieip.modbus.scanner-1.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/stephane/Documents/GitHub/EnergieIP-modbus-objects/EnergieIP modbus objects/jar/com.energieip.modbus.objects-1.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/stephane/Documents/GitHub/EnergieIP-modbus-scanner/EnergieIP modbus scanner/lib/com.energieip.easymodbus-1.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/stephane/Documents/GitHub/LibHandco/LibHandco/jar/LibHandco-1.0.jar"/>
-	<classpathentry kind="src" path="/EnergieIP modbus scanner"/>
+	<classpathentry kind="lib" path="E:/GIT/EnergieIP-EasyModbus/EnergieIP EasyModbus/jar/com.energieip.easymodbus-1.0.jar"/>
+	<classpathentry kind="lib" path="E:/GIT/LibHandco/LibHandco/jar/libhandco-1.1.jar"/>
+	<classpathentry kind="lib" path="E:/GIT/EnergieIP-modbus-objects/EnergieIP modbus objects/jar/com.energieip.modbus.objects-1.0.jar"/>
+	<classpathentry kind="lib" path="E:/GIT/EnergieIP-modbus-scanner/EnergieIP modbus scanner/jar/com.energieip.modbus.scanner-1.0.jar"/>
+	<classpathentry kind="lib" path="E:/GIT/EnergieIP-Core/EnergieIP Core/jar/com.energieip.core-1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
