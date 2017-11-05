@@ -10,10 +10,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
+import com.energieip.core.modbus.ModbusDataBuilder;
 import com.energieip.mobus.objects.CommonLists;
 import com.energieip.mobus.objects.ID11;
 import com.energieip.mobus.objects.ID2;
-import com.energieip.modbus.tools.ModbusDataBuilder;
 
 import com.energieip.modbuscan.ModbusScan;
 
