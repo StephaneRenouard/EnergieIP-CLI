@@ -38,12 +38,11 @@ public class CLI implements Runnable {
 	 * Default param
 	 */
 	final String DEFAULT_FILE = "driverList.eip";
-	//final String DEFAULT_IP = "192.168.0.118";
-	//final int DEFAULT_PORT = 502;
+	// final String DEFAULT_IP = "192.168.0.118";
+	// final int DEFAULT_PORT = 502;
 	final String DEFAULT_IP = "91.160.78.238";
 	final int DEFAULT_PORT = 41115;
-	
-	
+
 	/**
 	 * Main entry point
 	 * 
@@ -139,22 +138,22 @@ public class CLI implements Runnable {
 
 				String ip = DEFAULT_IP;
 				int port = DEFAULT_PORT;
-				
+
 				if (input.length > 1) {
 					ip = input[1];
 				}
 				if (input.length > 2) {
 					port = Integer.parseInt(input[2]);
 				}
-				
+
 				modbusClient = new ModbusClient(ip, port);
-				
+
 				try {
-					
+
 					modbusClient.Connect();
-					
-					ConnectionFlag=true;
-					
+
+					ConnectionFlag = true;
+
 				} catch (UnknownHostException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -162,7 +161,8 @@ public class CLI implements Runnable {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				System.out.println(Time.timeStamp("modbus connected with timeout="+ modbusClient.getConnectionTimeout()));
+				System.out.println(
+						Time.timeStamp("modbus connected with timeout=" + modbusClient.getConnectionTimeout()));
 
 				break;
 			case "disconnect":
@@ -199,7 +199,7 @@ public class CLI implements Runnable {
 					output_file = input[3];
 				}
 				System.out.println(Time.timeStamp("Scanning " + _ip + ":" + _port));
-				
+
 				ModbusScan.Scan(_ip, _port, output_file);
 				// System.out.println("writing file " + output_file);
 				break;
@@ -284,24 +284,24 @@ public class CLI implements Runnable {
 				}
 
 				break;
-				/*
-				 * SET
-				 */
+			/*
+			 * SET
+			 */
 			case "set":
-				
-				if (ListFlag && ConnectionFlag && input.length>1) {
-					
+
+				if (ListFlag && ConnectionFlag && input.length > 1) {
+
 					switch (input[1]) {
 					case "watchdog":
-						
+
 						if (input.length < 4) { // to get the #3 parameter
-							
+
 							setWatchdog(Integer.parseInt(input[2]));
-							
-						}else{
+
+						} else {
 							System.err.println(Time.timeStamp("ERROR: bad syntax"));
 						}
-						
+
 						break;
 					case "group": // set group L21 2
 						break;
@@ -310,26 +310,25 @@ public class CLI implements Runnable {
 						break;
 					default:
 						System.err.println(Time.timeStamp("Error: bad syntax"));
-						
+
 						break;
 					}
-					
-				}
-				else {
-					if(ListFlag==false){
-						System.err.println(Time.timeStamp("Error: you first need to load a description file in memory"));
+
+				} else {
+					if (ListFlag == false) {
+						System.err
+								.println(Time.timeStamp("Error: you first need to load a description file in memory"));
 					}
-					if(ConnectionFlag==false){
+					if (ConnectionFlag == false) {
 						System.err.println(Time.timeStamp("Error: you need to connect to modbus"));
-							
-					}
-					else{
+
+					} else {
 						System.err.println(Time.timeStamp("Error: bad syntax"));
-						
+
 					}
 				}
-				
-					break;
+
+				break;
 
 			case "":
 				break;
@@ -344,34 +343,33 @@ public class CLI implements Runnable {
 		}
 
 	}// end of InputAnalyse()
-	
+
 	/**
 	 * setWatchdog
+	 * 
 	 * @param value
 	 */
-public boolean setWatchdog(int value) {
-			
+	public boolean setWatchdog(int value) {
+
 		try {
-			
+
 			modbusClient.Disconnect();
 			modbusClient.Connect();
-			
+
 			modbusClient.setUnitIdentifier((byte) 3); // ID 3 (watchdog)
-			int[] Result  = modbusClient.ReadHoldingRegisters(0, 1);
-			
+			int[] Result = modbusClient.ReadHoldingRegisters(0, 1);
+
 			// keep previous value for comparaison
 			int previous_value = Result[0];
-			
+
 			modbusClient.WriteSingleRegister(0, value);
-			
+
 			// check result
-			Result  = modbusClient.ReadHoldingRegisters(0, 5);
-			
+			Result = modbusClient.ReadHoldingRegisters(0, 5);
+
 			int actual_value = Result[0];
-			
-			System.out.println(Time.timeStamp("[OK] Watchdog value from " + previous_value + " to " + actual_value ));
-			
-			
+
+			System.out.println(Time.timeStamp("[OK] Watchdog value from " + previous_value + " to " + actual_value));
 
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
@@ -386,10 +384,8 @@ public boolean setWatchdog(int value) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} // first register in ID2
-		
-		
+
 		return true;
 	}
-
 
 }// end of class
