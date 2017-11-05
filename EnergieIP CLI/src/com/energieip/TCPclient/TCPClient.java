@@ -16,8 +16,11 @@ import java.net.Socket;
 public class TCPClient {
 
 	public static void main(String argv[]) {
+		
 		String sentence = System.currentTimeMillis() + ": Test Message from TCP Client";
+		
 		Socket clientSocket = null;
+		
 		try {
 			clientSocket = new Socket("localhost", 8082);
 
@@ -34,5 +37,5 @@ public class TCPClient {
 			}
 		}
 	} // end of main
-	
+
 } // end of class
