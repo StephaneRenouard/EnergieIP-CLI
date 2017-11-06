@@ -15,7 +15,7 @@ import java.net.Socket;
  * @author stef
  *
  */
-public class TCPClient {
+public class TCPClient { 
 
 	public static void main(String argv[]) {
 		
