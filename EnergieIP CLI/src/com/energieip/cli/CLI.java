@@ -274,7 +274,7 @@ public class CLI implements Runnable {
 						count++;
 
 					}
-					System.out.println("Number of ligth drivers=" + CommonLists.ID11List.size());
+					System.out.println("Number of light drivers=" + CommonLists.ID11List.size());
 
 					// default case
 				} // end if listFlag
@@ -304,6 +304,18 @@ public class CLI implements Runnable {
 						
 						break;
 					case "group": // set group L21 2
+						
+						if (input.length < 5) { // to get the #3 and #4 parameters
+						
+							String friendlyName = input[2];
+							int SA = Integer.parseInt(friendlyName.substring(1, friendlyName.length()));
+							int target = Integer.parseInt(input[3]);
+							
+							moveGroup(friendlyName, SA, target);
+						
+						}	
+						
+						
 						break;
 					case "":
 						System.err.println(Time.timeStamp("Error: bad syntax"));
@@ -345,6 +357,24 @@ public class CLI implements Runnable {
 
 	}// end of InputAnalyse()
 	
+	private void moveGroup(String friendlyName, int sA, int target) {
+		
+			
+			try {
+				modbusClient.Disconnect();
+				modbusClient.Connect();
+				
+				modbusClient.setUnitIdentifier((byte) 3); // ID 3 (watchdog)
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			int[] Result  = modbusClient.ReadHoldingRegisters(0, 1);
+		
+	}
+
 	/**
 	 * setWatchdog
 	 * @param value
