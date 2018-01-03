@@ -10,22 +10,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
+import com.energieip.api.EnergieAPI;
 import com.energieip.mobus.objects.CommonLists;
 import com.energieip.mobus.objects.ID11;
 import com.energieip.mobus.objects.ID2;
-import com.energieip.modbus.tools.ModbusDataBuilder;
 
-import com.energieip.modbuscan.ModbusScan;
 
-import de.re.easymodbus.exceptions.ModbusException;
-import de.re.easymodbus.modbusclient.ModbusClient;
 import fr.handco.lib.time.Time;
 
 public class CLI implements Runnable {
+	
+	
+	EnergieAPI energieAPI;
+	
 
 	private Scanner scan;
-
-	ModbusClient modbusClient;
 
 	Thread thread;
 
@@ -40,8 +39,8 @@ public class CLI implements Runnable {
 	final String DEFAULT_FILE = "driverList.eip";
 	//final String DEFAULT_IP = "192.168.0.118";
 	//final int DEFAULT_PORT = 502;
-	final String DEFAULT_IP = "91.160.78.238";
-	final int DEFAULT_PORT = 41115;
+	String SERVER_IP = "91.160.78.238";
+	int SERVER_PORT = 41115;
 	
 	
 	/**
@@ -50,13 +49,27 @@ public class CLI implements Runnable {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new CLI();
+		
+		if(args.length==1){
+			new CLI(args[0], 8082);
+		}
+		else if(args.length==2){
+			new CLI(args[0], args[1]);
+		}
+		else{
+			// missing args. Exit with code 0.
+			System.out.println("ERROR: missing server IP");
+			System.out.println("CLI USAGE: java -jar cli.jar 127.0.0.1");
+			System.out.println("           java -jar cli.jar 127.0.0.1 8082");
+			System.exit(0);
+		}
+		
 	}
 
 	/**
 	 * Constructor
 	 */
-	public CLI() {
+	public CLI(String _SERVER_IP) {
 
 		/*
 		 * 
@@ -86,8 +99,15 @@ public class CLI implements Runnable {
 		 * 
 		 */
 
-		System.out.println("EnergieIP CLI v1.0");
-
+		System.out.println(Time.timeStamp("EnergieIP CLI v1.1"));
+		
+		// set SERVER IP as global
+		SERVER_IP = _SERVER_IP;
+		
+		energieAPI = new EnergieAPI();
+		energieAPI.setTCPserver_IP(SERVER_IP);
+		
+		
 		// Launch Thread
 		thread = new Thread(this);
 		thread.start();
@@ -127,57 +147,33 @@ public class CLI implements Runnable {
 	 * @param text
 	 */
 	private void InputAnalyse(String text) {
+		
+		String[] input = text.split(" "); // split input to extract args
 
-		String[] input = text.split(" ");
+		String[] list; // list from EnergieAPI
+		
+		if (input.length > 0) { // ensure that at least one command is provided
 
-		if (input.length > 0) {
-
-			String key = input[0];
+			String key = input[0]; // first command
 
 			switch (key) {
 			case "connect":
 
-				String ip = DEFAULT_IP;
-				int port = DEFAULT_PORT;
+					System.out.println(Time.timeStamp("Autoconnected to " + SERVER_IP));
 				
-				if (input.length > 1) {
-					ip = input[1];
-				}
-				if (input.length > 2) {
-					port = Integer.parseInt(input[2]);
-				}
-				
-				modbusClient = new ModbusClient(ip, port);
-				
-				try {
-					
-					modbusClient.Connect();
-					
-					ConnectionFlag=true;
-					
-				} catch (UnknownHostException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				System.out.println(Time.timeStamp("modbus connected with timeout="+ modbusClient.getConnectionTimeout()));
-
 				break;
 			case "disconnect":
 				try {
-					modbusClient.Disconnect();
+					System.out.println(Time.timeStamp("Autoconnected to " + SERVER_IP));
+					//modbusClient.Disconnect();
 					ConnectionFlag = false;
-				} catch (IOException e) {
-					System.out.println(Time.timeStamp("modbus disconnected"));
 				} catch (Exception ee) {
 					System.out.println(Time.timeStamp("modbus disconnected"));
 				}
 				break;
 
 			case "help":
-				System.out.println("key1");
+				System.out.println("help yourself");
 				break;
 
 			case "show":
@@ -185,22 +181,10 @@ public class CLI implements Runnable {
 				break;
 
 			case "scan":
-				int _port = DEFAULT_PORT;
-				String _ip = DEFAULT_IP;
-				String output_file = DEFAULT_FILE;
-
-				if (input.length > 1) {
-					_ip = input[1];
-				}
-				if (input.length > 2) {
-					_port = Integer.parseInt(input[2]);
-				}
-				if (input.length > 3) {
-					output_file = input[3];
-				}
-				System.out.println(Time.timeStamp("Scanning " + _ip + ":" + _port));
 				
-				ModbusScan.Scan(_ip, _port, output_file);
+				
+				
+				//ModbusScan.Scan(_ip, _port, output_file);
 				// System.out.println("writing file " + output_file);
 				break;
 
@@ -233,19 +217,19 @@ public class CLI implements Runnable {
 				CommonLists.iD3 = new com.energieip.mobus.objects.ID3();
 
 				// make ID11 (light) list
-				ModbusDataBuilder.makeID11List();
+				//ModbusDataBuilder.makeID11List();
 
 				// make ID12 (HVAC) list
-				ModbusDataBuilder.makeID12List();
+				//ModbusDataBuilder.makeID12List();
 
 				// make ID13 (shutter) list
-				ModbusDataBuilder.makeID13List();
+				//ModbusDataBuilder.makeID13List();
 
 				// make group list
-				ModbusDataBuilder.makeGroupList();
+				//ModbusDataBuilder.makeGroupList();
 
 				// make ID100 (group param) list
-				ModbusDataBuilder.makeID100List();
+				//ModbusDataBuilder.makeID100List();
 
 				// file found and data acquired
 				System.out.println(Time.timeStamp("Data acquired"));
@@ -253,37 +237,61 @@ public class CLI implements Runnable {
 				break;
 
 			case "list":
-
-				if (ListFlag) {
-
-					String fileName = DEFAULT_FILE;
-
-					if (input.length > 1) {
-						fileName = input[1];
+				
+				switch(input[1]){
+				case "group":
+					list = energieAPI.getList_groups();
+					for (int i = 0; i < list.length; i++) {
+						System.out.println(list[i]);
 					}
-
-					System.out.println(Time.timeStamp("LIGHT drivers:"));
-
-					int count = 0;
-
-					for (Iterator<ID11> iterator = CommonLists.ID11List.iterator(); iterator.hasNext();) {
-
-						ID11 id11 = (ID11) iterator.next();
-						System.out.println("L" + id11.shortAddress + " (group " + id11.group + ")");
-
-						count++;
-
-					}
-					System.out.println("Number of light drivers=" + CommonLists.ID11List.size());
-
-					// default case
-				} // end if listFlag
-				else {
-					// no list in memory
-					System.err.println(Time.timeStamp("ERROR: no data in memory, perform a scan first"));
-				}
-
+					
+					System.out.println(list.length + " group(s) found");
 				break;
+				case "light":
+					list = energieAPI.getList_Light_drivers();
+					for (int i = 0; i < list.length; i++) {
+						System.out.println("[" + i + "] " + list[i]);
+					}
+					
+					System.out.println(list.length + " light driver(s) found");
+				break;
+				case "shutter":
+					list = energieAPI.getList_Shutter_drivers();
+					for (int i = 0; i < list.length; i++) {
+						System.out.println("[" + i + "] " + list[i]);
+					}
+					
+					System.out.println(list.length + " shutter driver(s) found");
+				break;
+				case "hvac":
+					list = energieAPI.getList_HVAC_drivers();
+					for (int i = 0; i < list.length; i++) {
+						System.out.println("[" + i + "] " + list[i]);
+					}
+					
+					System.out.println(list.length + " hvac driver(s) found");
+				break;
+				case "tor":
+					list = energieAPI.getList_TOR_drivers();
+					for (int i = 0; i < list.length; i++) {
+						System.out.println("[" + i + "] " + list[i]);
+					}
+					
+					System.out.println(list.length + " tor driver(s) found");
+				break;
+				// default case
+				default:
+				list = energieAPI.getList();
+				
+				for (int i = 0; i < list.length; i++) {
+					System.out.println("[" + i + "] " + list[i]);
+				}
+				
+				System.out.println(list.length + " drivers found");
+				break; // end of default
+				} // end of switch "input[1]
+				
+				break; // end of case "list"
 				/*
 				 * SET
 				 */
@@ -296,7 +304,10 @@ public class CLI implements Runnable {
 						
 						if (input.length < 4) { // to get the #3 parameter
 							
-							setWatchdog(Integer.parseInt(input[2]));
+							int value  = Integer.parseInt(input[2]);
+							
+												
+							
 							
 						}else{
 							System.err.println(Time.timeStamp("ERROR: bad syntax"));
@@ -357,69 +368,8 @@ public class CLI implements Runnable {
 
 	}// end of InputAnalyse()
 	
-	private void moveGroup(String friendlyName, int sA, int target) {
-		
-			
-			try {
-				modbusClient.Disconnect();
-				modbusClient.Connect();
-				
-				modbusClient.setUnitIdentifier((byte) 3); // ID 3 (watchdog)
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			int[] Result  = modbusClient.ReadHoldingRegisters(0, 1);
-		
-	}
-
-	/**
-	 * setWatchdog
-	 * @param value
-	 */
-public boolean setWatchdog(int value) {
-			
-		try {
-			
-			modbusClient.Disconnect();
-			modbusClient.Connect();
-			
-			modbusClient.setUnitIdentifier((byte) 3); // ID 3 (watchdog)
-			int[] Result  = modbusClient.ReadHoldingRegisters(0, 1);
-			
-			// keep previous value for comparaison
-			int previous_value = Result[0];
-			
-			modbusClient.WriteSingleRegister(0, value);
-			
-			// check result
-			Result  = modbusClient.ReadHoldingRegisters(0, 5);
-			
-			int actual_value = Result[0];
-			
-			System.out.println(Time.timeStamp("[OK] Watchdog value from " + previous_value + " to " + actual_value ));
-			
-			
-
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SocketException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ModbusException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} // first register in ID2
-		
-		
-		return true;
-	}
+	
+	
 
 
 }// end of class
