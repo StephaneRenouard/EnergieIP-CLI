@@ -11,10 +11,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import com.energieip.api.EnergieAPI;
-import com.energieip.mobus.objects.CommonLists;
-import com.energieip.mobus.objects.ID11;
-import com.energieip.mobus.objects.ID2;
-
 
 import fr.handco.lib.time.Time;
 
@@ -23,7 +19,6 @@ public class CLI implements Runnable {
 	
 	EnergieAPI energieAPI;
 	
-
 	private Scanner scan;
 
 	Thread thread;
@@ -54,7 +49,7 @@ public class CLI implements Runnable {
 			new CLI(args[0], 8082);
 		}
 		else if(args.length==2){
-			new CLI(args[0], args[1]);
+			new CLI(args[0], Integer.parseInt(args[1]));
 		}
 		else{
 			// missing args. Exit with code 0.
@@ -69,7 +64,7 @@ public class CLI implements Runnable {
 	/**
 	 * Constructor
 	 */
-	public CLI(String _SERVER_IP) {
+	public CLI(String _SERVER_IP, int _SERVER_PORT) {
 
 		/*
 		 * 
@@ -99,13 +94,13 @@ public class CLI implements Runnable {
 		 * 
 		 */
 
-		System.out.println(Time.timeStamp("EnergieIP CLI v1.1"));
+		System.out.println(Time.timeStamp("EnergieIP CLI v1.2"));
 		
 		// set SERVER IP as global
 		SERVER_IP = _SERVER_IP;
 		
 		energieAPI = new EnergieAPI();
-		energieAPI.setTCPserver_IP(SERVER_IP);
+		energieAPI.set_TCPserver_IP(SERVER_IP);
 		
 		
 		// Launch Thread
@@ -182,65 +177,17 @@ public class CLI implements Runnable {
 
 			case "scan":
 				
-				
-				
-				//ModbusScan.Scan(_ip, _port, output_file);
-				// System.out.println("writing file " + output_file);
 				break;
 
 			case "read":
 
-				String file = DEFAULT_FILE;
-
-				if (input.length > 1) {
-					file = input[1];
-				}
-
-				System.out.println(Time.timeStamp("Reading data from " + file));
-
-				ObjectInputStream ois;
-				try {
-					ois = new ObjectInputStream(new FileInputStream(file));
-					CommonLists.driverList = (List<ID2>) ois.readObject();
-					ois.close();
-				} catch (FileNotFoundException e) {
-					System.err.println(Time.timeStamp("ERROR: File not Found"));
-				} catch (IOException e) {
-					System.err.println(Time.timeStamp("ERROR: IOException"));
-				} catch (ClassNotFoundException e) {
-					System.err.println(Time.timeStamp("ERROR: Internal Error (ClassNotFoundException)"));
-				}
-
-				System.out.println(Time.timeStamp("Building objects"));
-
-				// ID3 is a standalone register
-				CommonLists.iD3 = new com.energieip.mobus.objects.ID3();
-
-				// make ID11 (light) list
-				//ModbusDataBuilder.makeID11List();
-
-				// make ID12 (HVAC) list
-				//ModbusDataBuilder.makeID12List();
-
-				// make ID13 (shutter) list
-				//ModbusDataBuilder.makeID13List();
-
-				// make group list
-				//ModbusDataBuilder.makeGroupList();
-
-				// make ID100 (group param) list
-				//ModbusDataBuilder.makeID100List();
-
-				// file found and data acquired
-				System.out.println(Time.timeStamp("Data acquired"));
-				ListFlag = true;
 				break;
 
 			case "list":
 				
 				switch(input[1]){
 				case "group":
-					list = energieAPI.getList_groups();
+					list = energieAPI.get_list_groups();
 					for (int i = 0; i < list.length; i++) {
 						System.out.println(list[i]);
 					}
@@ -248,7 +195,7 @@ public class CLI implements Runnable {
 					System.out.println(list.length + " group(s) found");
 				break;
 				case "light":
-					list = energieAPI.getList_Light_drivers();
+					list = energieAPI.get_list_light_drivers();
 					for (int i = 0; i < list.length; i++) {
 						System.out.println("[" + i + "] " + list[i]);
 					}
@@ -256,15 +203,23 @@ public class CLI implements Runnable {
 					System.out.println(list.length + " light driver(s) found");
 				break;
 				case "shutter":
-					list = energieAPI.getList_Shutter_drivers();
+					list = energieAPI.get_list_shutter_drivers();
 					for (int i = 0; i < list.length; i++) {
 						System.out.println("[" + i + "] " + list[i]);
 					}
 					
 					System.out.println(list.length + " shutter driver(s) found");
 				break;
+				case "blind":
+					list = energieAPI.get_list_blind_drivers();
+					for (int i = 0; i < list.length; i++) {
+						System.out.println("[" + i + "] " + list[i]);
+					}
+					
+					System.out.println(list.length + " bind driver(s) found");
+				break;
 				case "hvac":
-					list = energieAPI.getList_HVAC_drivers();
+					list = energieAPI.get_list_HVAC_drivers();
 					for (int i = 0; i < list.length; i++) {
 						System.out.println("[" + i + "] " + list[i]);
 					}
@@ -272,16 +227,24 @@ public class CLI implements Runnable {
 					System.out.println(list.length + " hvac driver(s) found");
 				break;
 				case "tor":
-					list = energieAPI.getList_TOR_drivers();
+					list = energieAPI.get_list_TOR_drivers();
 					for (int i = 0; i < list.length; i++) {
 						System.out.println("[" + i + "] " + list[i]);
 					}
 					
 					System.out.println(list.length + " tor driver(s) found");
 				break;
+				case "io":
+					list = energieAPI.get_list_TOR_drivers();
+					for (int i = 0; i < list.length; i++) {
+						System.out.println("[" + i + "] " + list[i]);
+					}
+					
+					System.out.println(list.length + " I/O driver(s) found");
+				break;
 				// default case
 				default:
-				list = energieAPI.getList();
+				list = energieAPI.get_list();
 				
 				for (int i = 0; i < list.length; i++) {
 					System.out.println("[" + i + "] " + list[i]);
@@ -306,9 +269,6 @@ public class CLI implements Runnable {
 							
 							int value  = Integer.parseInt(input[2]);
 							
-												
-							
-							
 						}else{
 							System.err.println(Time.timeStamp("ERROR: bad syntax"));
 						}
@@ -322,7 +282,7 @@ public class CLI implements Runnable {
 							int SA = Integer.parseInt(friendlyName.substring(1, friendlyName.length()));
 							int target = Integer.parseInt(input[3]);
 							
-							moveGroup(friendlyName, SA, target);
+							//moveGroup(friendlyName, SA, target);
 						
 						}	
 						
