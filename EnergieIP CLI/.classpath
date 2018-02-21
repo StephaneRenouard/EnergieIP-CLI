@@ -2,9 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="src" path="/EnergieIP modbus scanner"/>
-	<classpathentry kind="lib" path="lib/EnergieAPI-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/libhandco-1.1.jar"/>
-	<classpathentry kind="lib" path="lib/com.energieip.modbus.objects-1.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/EnergieIP API Java"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/LibHandco"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
