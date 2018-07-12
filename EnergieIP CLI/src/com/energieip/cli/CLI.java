@@ -1,13 +1,6 @@
 package com.energieip.cli;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.Iterator;
-import java.util.List;
+
 import java.util.Scanner;
 
 import com.energieip.api.EnergieAPI;
@@ -26,16 +19,13 @@ public class CLI implements Runnable {
 	private boolean ListFlag = false; // indicate that we have a file in memory
 	private boolean ConnectionFlag = false; // indicate connection state
 
-	// private static List<com.energieip.mobus.objects.ID2> driverList;
 
 	/**
 	 * Default param
 	 */
-	final String DEFAULT_FILE = "driverList.eip";
-	//final String DEFAULT_IP = "192.168.0.118";
-	//final int DEFAULT_PORT = 502;
-	String SERVER_IP = "91.160.78.238";
-	int SERVER_PORT = 41115;
+	static String SERVER_IP = "127.0.0.1";
+	static int SERVER_PORT = 8082;
+
 	
 	
 	/**
@@ -46,10 +36,10 @@ public class CLI implements Runnable {
 	public static void main(String[] args) {
 		
 		if(args.length==1){
-			new CLI(args[0], 8082);
+			new CLI(args[0], SERVER_PORT);  // custom IP,  default server port
 		}
 		else if(args.length==2){
-			new CLI(args[0], Integer.parseInt(args[1]));
+			new CLI(args[0], Integer.parseInt(args[1])); // custom IP,  custom server port
 		}
 		else{
 			// missing args. Exit with code 0.
@@ -98,6 +88,7 @@ public class CLI implements Runnable {
 		
 		// set SERVER IP as global
 		SERVER_IP = _SERVER_IP;
+		SERVER_PORT = _SERVER_PORT;
 		
 		energieAPI = new EnergieAPI();
 		energieAPI.set_TCPserver_IP(SERVER_IP);
@@ -153,9 +144,7 @@ public class CLI implements Runnable {
 
 			switch (key) {
 			case "connect":
-
 					System.out.println(Time.timeStamp("Autoconnected to " + SERVER_IP));
-				
 				break;
 			case "disconnect":
 				try {
@@ -202,14 +191,6 @@ public class CLI implements Runnable {
 					
 					System.out.println(list.length + " light driver(s) found");
 				break;
-				case "shutter":
-					list = energieAPI.get_list_shutter_drivers();
-					for (int i = 0; i < list.length; i++) {
-						System.out.println("[" + i + "] " + list[i]);
-					}
-					
-					System.out.println(list.length + " shutter driver(s) found");
-				break;
 				case "blind":
 					list = energieAPI.get_list_blind_drivers();
 					for (int i = 0; i < list.length; i++) {
@@ -225,14 +206,6 @@ public class CLI implements Runnable {
 					}
 					
 					System.out.println(list.length + " hvac driver(s) found");
-				break;
-				case "tor":
-					list = energieAPI.get_list_TOR_drivers();
-					for (int i = 0; i < list.length; i++) {
-						System.out.println("[" + i + "] " + list[i]);
-					}
-					
-					System.out.println(list.length + " tor driver(s) found");
 				break;
 				case "io":
 					list = energieAPI.get_list_TOR_drivers();
