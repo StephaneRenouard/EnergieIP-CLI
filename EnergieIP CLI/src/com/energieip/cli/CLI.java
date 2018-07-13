@@ -190,7 +190,7 @@ public class CLI implements Runnable {
 				case "light":
 					list = energieAPI.get_list_light_drivers();
 					for (int i = 0; i < list.length; i++) {
-						System.out.println("[" + i + "] " + list[i]);
+						System.out.println(list[i]);
 					}
 					
 					System.out.println(list.length + " light driver(s) found");
@@ -198,15 +198,15 @@ public class CLI implements Runnable {
 				case "blind":
 					list = energieAPI.get_list_blind_drivers();
 					for (int i = 0; i < list.length; i++) {
-						System.out.println("[" + i + "] " + list[i]);
+						System.out.println(list[i]);
 					}
 					
-					System.out.println(list.length + " bind driver(s) found");
+					System.out.println(list.length + " blind driver(s) found");
 				break;
 				case "hvac":
 					list = energieAPI.get_list_HVAC_drivers();
 					for (int i = 0; i < list.length; i++) {
-						System.out.println("[" + i + "] " + list[i]);
+						System.out.println(list[i]);
 					}
 					
 					System.out.println(list.length + " hvac driver(s) found");
@@ -214,20 +214,34 @@ public class CLI implements Runnable {
 				case "io":
 					list = energieAPI.get_list_TOR_drivers();
 					for (int i = 0; i < list.length; i++) {
-						System.out.println("[" + i + "] " + list[i]);
+						System.out.println(list[i]);
 					}
 					
 					System.out.println(list.length + " I/O driver(s) found");
 				break;
 				// default case
 				default:
-				list = energieAPI.get_list();
-				
-				for (int i = 0; i < list.length; i++) {
-					System.out.println("[" + i + "] " + list[i]);
-				}
-				
-				System.out.println(list.length + " drivers found");
+					list = energieAPI.get_list_groups();
+					for (int i = 0; i < list.length; i++) {
+						System.out.println(list[i]);
+					}
+					
+					System.out.println(list.length + " group(s) found");
+					list = energieAPI.get_list_light_drivers();
+					for (int i = 0; i < list.length; i++) {
+						System.out.println(list[i]);
+					}
+					
+					System.out.println(list.length + " light driver(s) found");
+			
+					list = energieAPI.get_list_blind_drivers();
+					for (int i = 0; i < list.length; i++) {
+						System.out.println(list[i]);
+					}
+					
+					System.out.println(list.length + " blind driver(s) found");
+
+
 				break; // end of default
 				} // end of switch "input[1]
 				
