@@ -19,7 +19,8 @@ public class CLI implements Runnable {
 	private boolean ListFlag = false; // indicate that we have a file in memory
 	private boolean ConnectionFlag = false; // indicate connection state
 
-
+	private boolean DEBUG = true;
+	
 	/**
 	 * Default param
 	 */
@@ -133,6 +134,9 @@ public class CLI implements Runnable {
 	 * @param text
 	 */
 	private void InputAnalyse(String text) {
+		
+		try{
+			
 		
 		String[] input = text.split(" "); // split input to extract args
 
@@ -297,6 +301,14 @@ public class CLI implements Runnable {
 
 		} else {
 			// input size is 0, do nothing
+		}
+	
+		}catch (Exception e){
+			// do nothing
+			if(DEBUG){
+				System.err.println(e.getMessage());
+				System.err.println(e.getStackTrace());
+			}
 		}
 
 	}// end of InputAnalyse()
