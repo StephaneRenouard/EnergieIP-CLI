@@ -135,7 +135,7 @@ public class CLI implements Runnable {
 	 */
 	private void InputAnalyse(String text) {
 		
-		try{
+		//try{
 			
 		
 		String[] input = text.split(" "); // split input to extract args
@@ -159,25 +159,17 @@ public class CLI implements Runnable {
 					System.out.println(Time.timeStamp("modbus disconnected"));
 				}
 				break;
-
 			case "help":
 				System.out.println("help yourself");
 				break;
-
 			case "show":
 				System.out.println("show1");
 				break;
-
-			case "scan":
-				
+			case "scan":				
 				break;
-
 			case "read":
-
 				break;
-
-			case "list":
-				
+			case "list":				
 				switch(input[1]){
 				case "group":
 					list = energieAPI.get_list_groups();
@@ -186,7 +178,7 @@ public class CLI implements Runnable {
 					}
 					
 					System.out.println(list.length + " group(s) found");
-				break;
+					break;
 				case "light":
 					list = energieAPI.get_list_light_drivers();
 					for (int i = 0; i < list.length; i++) {
@@ -194,7 +186,7 @@ public class CLI implements Runnable {
 					}
 					
 					System.out.println(list.length + " light driver(s) found");
-				break;
+					break;
 				case "blind":
 					list = energieAPI.get_list_blind_drivers();
 					for (int i = 0; i < list.length; i++) {
@@ -202,7 +194,7 @@ public class CLI implements Runnable {
 					}
 					
 					System.out.println(list.length + " blind driver(s) found");
-				break;
+					break;
 				case "hvac":
 					list = energieAPI.get_list_HVAC_drivers();
 					for (int i = 0; i < list.length; i++) {
@@ -210,7 +202,7 @@ public class CLI implements Runnable {
 					}
 					
 					System.out.println(list.length + " hvac driver(s) found");
-				break;
+					break;
 				case "io":
 					list = energieAPI.get_list_TOR_drivers();
 					for (int i = 0; i < list.length; i++) {
@@ -218,8 +210,8 @@ public class CLI implements Runnable {
 					}
 					
 					System.out.println(list.length + " I/O driver(s) found");
-				break;
-				// default case
+					break;
+					// default case
 				default:
 					list = energieAPI.get_list_groups();
 					for (int i = 0; i < list.length; i++) {
@@ -240,21 +232,16 @@ public class CLI implements Runnable {
 					}
 					
 					System.out.println(list.length + " blind driver(s) found");
-
-
 				break; // end of default
 				} // end of switch "input[1]
 				
-				break; // end of case "list"
+				//break; // end of case "list"
 				/*
 				 * SET
 				 */
-			case "set":
-				
-				if (ListFlag && ConnectionFlag && input.length>1) {
-					
-					switch (input[1]) {
-					case "watchdog":
+			case "set":				
+				switch (input[1]) {
+				case "watchdog":
 						
 						if (input.length < 4) { // to get the #3 parameter
 							
@@ -265,58 +252,42 @@ public class CLI implements Runnable {
 						}
 						
 						break;
-					case "group": // set group L21 2
+				case "group": // set group L21 2
 						
 						if (input.length < 5) { // to get the #3 and #4 parameters
 						
 							String friendlyName = input[2];
 							int SA = Integer.parseInt(friendlyName.substring(1, friendlyName.length()));
-							int target = Integer.parseInt(input[3]);
-							
-							//moveGroup(friendlyName, SA, target);
-						
+							int target = Integer.parseInt(input[3]);							
+							//moveGroup(friendlyName, SA, target);					
 						}	
-						
-						
-						break;
-					case "":
-						System.err.println(Time.timeStamp("Error: bad syntax"));
-						break;
-					default:
-						System.err.println(Time.timeStamp("Error: bad syntax"));
-						
-						break;
-					}
-					
-				}
-				else {
-					if(ListFlag==false){
-						System.err.println(Time.timeStamp("Error: you first need to load a description file in memory"));
-					}
-					if(ConnectionFlag==false){
-						System.err.println(Time.timeStamp("Error: you need to connect to modbus"));
-							
-					}
-					else{
-						System.err.println(Time.timeStamp("Error: bad syntax"));
-						
-					}
-				}
-				
 					break;
-
+				case "":
+						System.err.println(Time.timeStamp("Error: bad syntax"));
+						break;
+				default:
+						System.err.println(Time.timeStamp("Error: bad syntax"));
+						
+						break;
+				} // end of switch set
+			case "get":
+				switch (input[1]) {
+				case "watchdog":
+						energieAPI.get_Watchdog();
+				break;				
 			case "":
 				break;
-
 			default:
 				System.out.println("Bad order");
 				break;
-			}// end switch
-
+			}// end switch get
+		} // end of SWITCH
+		
 		} else {
 			// input size is 0, do nothing
 		}
-	
+			
+		/*
 		}catch (Exception e){
 			// do nothing
 			if(DEBUG){
@@ -324,6 +295,7 @@ public class CLI implements Runnable {
 				System.err.println(e.getStackTrace());
 			}
 		}
+		*/
 
 	}// end of InputAnalyse()
 	
